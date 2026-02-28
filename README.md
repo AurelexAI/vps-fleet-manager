@@ -122,8 +122,11 @@ Set `AUTO_START_CODEX` to `false` in `.devcontainer/devcontainer.json` if you do
 
 ## License
 
-This project is licensed under the Apache License 2.0.
+This repository is a cloned and modified version of Ratio1 Open Source.
 
+- Upstream base: Ratio1 Open Source under Apache License 2.0 (commercial use allowed).
+- This modified repository includes AurelexAI-specific changes.
+- The repository remains open, but commercial use of AurelexAI-specific modifications requires prior written permission from AurelexAI.
 - License text: `LICENSE.md`
-- Attribution notices: `NOTICE`
+- Attribution and fork notice: `NOTICE`
 - Copyright: Copyright (c) 2026 AurelexAI

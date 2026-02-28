@@ -2,3 +2,5 @@
 PROMPT.md
 node_modules/
 .codex/config.toml
+docs/
+docs/ITERATIONS.md

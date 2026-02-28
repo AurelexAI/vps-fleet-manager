@@ -1,6 +1,11 @@
 vps-fleet-manager
 Copyright (c) 2026 AurelexAI
 
+This repository was cloned from Ratio1 Open Source and modified for AurelexAI.
+Upstream Ratio1 source is Apache License 2.0 and allows commercial use.
+This modified repository remains open, but commercial use of AurelexAI-specific
+modifications requires prior written permission from AurelexAI.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at:
