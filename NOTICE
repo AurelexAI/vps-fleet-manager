@@ -2,6 +2,7 @@ vps-fleet-manager
 Copyright (c) 2026 AurelexAI
 
 This repository was cloned from Ratio1 Open Source and modified for AurelexAI.
+Original repository: https://github.com/Ratio1/vps-agent
 Upstream Ratio1 source is Apache License 2.0 and allows commercial use.
 This modified repository remains open, but commercial use of AurelexAI-specific
 modifications requires prior written permission from AurelexAI.
