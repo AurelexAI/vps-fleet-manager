@@ -1,0 +1,9 @@
+{
+  "name": "vps-fleet-manager",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "node",
+  "postCreateCommand": "bash scripts/bootstrap-unix.sh --skip-install",
+  "postAttachCommand": "bash scripts/devcontainer-onboarding.sh"
+}

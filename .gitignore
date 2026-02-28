@@ -1,0 +1,4 @@
+.env
+PROMPT.md
+node_modules/
+.codex/config.toml
