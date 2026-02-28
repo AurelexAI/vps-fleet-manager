@@ -23,7 +23,7 @@ Enable users to create and run a Codex-based Hostinger fleet-management agent lo
 - `scripts/doctor-unix.sh` / `scripts/doctor-windows.ps1`
   - preflight checks
 - `scripts/start-agent.sh` / `scripts/start-agent.ps1`
-  - start Codex from project root
+  - start Codex from project root with initial purpose/version intro
 - `.devcontainer/*`
   - optional Windows-friendly development environment
 
@@ -53,6 +53,7 @@ Success criteria:
 - Add clear `AGENTS.md` policy.
 - Document safe execution patterns in README.
 - Add doctor scripts for fast diagnosis.
+- Ensure startup prompt introduces agent purpose and repository version.
 
 Success criteria:
 

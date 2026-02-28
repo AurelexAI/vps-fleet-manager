@@ -34,3 +34,4 @@ Finalized docs and policy:
 - AGENTS.md updated with hard architectural constraints
 - research and implementation plan aligned to correct approach
 - devcontainer now runs guided onboarding for Codex auth + Hostinger token
+- Codex now auto-starts (interactive attach) and receives an intro prompt with purpose + version from ver.yaml

@@ -3,6 +3,9 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "containerEnv": {
+    "AUTO_START_CODEX": "true"
+  },
   "remoteUser": "node",
   "postCreateCommand": "bash scripts/bootstrap-unix.sh --skip-install",
   "postAttachCommand": "bash scripts/devcontainer-onboarding.sh"

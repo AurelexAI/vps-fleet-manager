@@ -141,5 +141,19 @@ fi
 
 bash scripts/doctor-unix.sh
 
+AUTO_START_CODEX_VALUE="${AUTO_START_CODEX:-true}"
+AUTO_START_CODEX_VALUE="$(echo "$AUTO_START_CODEX_VALUE" | tr '[:upper:]' '[:lower:]')"
+
+if [[ "$AUTO_START_CODEX_VALUE" =~ ^(1|true|yes|y)$ ]]; then
+  if is_tty; then
+    info "Starting Codex automatically..."
+    exec bash scripts/start-agent.sh --auto
+  fi
+
+  warn "AUTO_START_CODEX is enabled but terminal is non-interactive."
+  warn "Start manually with: bash scripts/start-agent.sh"
+  exit 0
+fi
+
 echo
-echo "Ready. Start Codex with: codex"
+echo "Ready. Start Codex with: bash scripts/start-agent.sh"

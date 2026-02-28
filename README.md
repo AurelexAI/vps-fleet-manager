@@ -17,8 +17,11 @@ When you open this repo in a VS Code Dev Container:
    - Entering your `HOSTINGER_API_TOKEN`
    - Writing `.env` for you
    - Final health check
+4. Codex starts automatically and sends an intro that includes:
+   - Agent purpose
+   - Repository version from `ver.yaml`
 
-After that, you just run `codex`.
+After that, you can immediately chat with the agent.
 
 ## Super Simple Setup (recommended)
 
@@ -61,12 +64,14 @@ If the prompt window does not appear, run manually in the container terminal:
 bash scripts/devcontainer-onboarding.sh
 ```
 
-## 5. Start the agent
+## 5. Codex starts automatically
 
-In the container terminal:
+After onboarding finishes, Codex auto-launches.
+
+If it does not launch (rare terminal issue), run:
 
 ```bash
-codex
+bash scripts/start-agent.sh
 ```
 
 Now ask things like:
@@ -86,6 +91,7 @@ Now ask things like:
 
 - Devcontainer config: `.devcontainer/devcontainer.json`
 - Onboarding script: `scripts/devcontainer-onboarding.sh`
+- Agent launcher with intro prompt: `scripts/start-agent.sh`
 - MCP wrapper (Linux): `scripts/hostinger-mcp.sh`
 - Linux Codex MCP template: `.codex/config.toml.example`
 - Agent rules: `AGENTS.md`
@@ -97,7 +103,7 @@ Linux/macOS:
 ```bash
 ./scripts/bootstrap-unix.sh
 ./scripts/doctor-unix.sh
-codex
+bash scripts/start-agent.sh
 ```
 
 Windows PowerShell:
@@ -105,5 +111,9 @@ Windows PowerShell:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1
 powershell -ExecutionPolicy Bypass -File scripts/doctor-windows.ps1
-codex
+powershell -ExecutionPolicy Bypass -File scripts/start-agent.ps1
 ```
+
+## Disable auto-start (optional)
+
+Set `AUTO_START_CODEX` to `false` in `.devcontainer/devcontainer.json` if you do not want Codex to auto-open on each attach.
