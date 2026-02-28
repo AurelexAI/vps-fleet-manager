@@ -68,10 +68,12 @@ bash scripts/devcontainer-onboarding.sh
 
 After onboarding finishes, Codex auto-launches.
 
+If VS Code runs `postAttachCommand` in a non-interactive context, auto-start is deferred to your first interactive terminal in the workspace and runs automatically there.
+
 If it does not launch (rare terminal issue), run:
 
 ```bash
-bash scripts/start-agent.sh
+bash scripts/devcontainer-onboarding.sh
 ```
 
 Now ask things like:
@@ -116,4 +118,12 @@ powershell -ExecutionPolicy Bypass -File scripts/start-agent.ps1
 
 ## Disable auto-start (optional)
 
-Set `AUTO_START_CODEX` to `false` in `.devcontainer/devcontainer.json` if you do not want Codex to auto-open on each attach.
+Set `AUTO_START_CODEX` to `false` in `.devcontainer/devcontainer.json` if you do not want Codex to auto-open on the first interactive terminal after each container start.
+
+## License
+
+This project is licensed under the Apache License 2.0.
+
+- License text: `LICENSE.md`
+- Attribution notices: `NOTICE`
+- Copyright: Copyright (c) 2026 AurelexAI

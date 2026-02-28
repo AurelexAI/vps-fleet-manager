@@ -63,6 +63,7 @@ Success criteria:
 
 - Add VS Code devcontainer with global tool preinstall.
 - Add auto-run onboarding step on container attach.
+- Add interactive-terminal fallback autostart hook for environments where attach hooks are non-interactive.
 
 Success criteria:
 

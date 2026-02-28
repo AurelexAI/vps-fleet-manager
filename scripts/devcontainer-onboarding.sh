@@ -63,6 +63,47 @@ env_upsert() {
   mv "$tmp" "$file"
 }
 
+install_bashrc_autostart_hook() {
+  local bashrc_path="$HOME/.bashrc"
+  local hook_start="# >>> vps-fleet-manager codex autostart >>>"
+  local hook_end="# <<< vps-fleet-manager codex autostart <<<"
+
+  ensure_file "$bashrc_path"
+
+  local tmp
+  tmp=$(mktemp)
+
+  awk -v start="$hook_start" -v end="$hook_end" '
+    $0 == start { in_block = 1; next }
+    $0 == end { in_block = 0; next }
+    !in_block { print }
+  ' "$bashrc_path" > "$tmp"
+
+  cat >> "$tmp" <<EOF
+
+$hook_start
+if [[ -n "\${DEVCONTAINER:-}" || "\${REMOTE_CONTAINERS:-}" == "true" ]] && [[ -t 0 && -t 1 ]]; then
+  _vps_fleet_root="$ROOT_DIR"
+  _vps_fleet_marker="/tmp/vps-fleet-manager-codex-autostart.\${USER:-node}"
+  _vps_fleet_auto_start="\${AUTO_START_CODEX:-true}"
+  _vps_fleet_auto_start="\$(echo "\$_vps_fleet_auto_start" | tr '[:upper:]' '[:lower:]')"
+  if [[ "\$_vps_fleet_auto_start" =~ ^(1|true|yes|y)$ ]] && [[ -f "\$_vps_fleet_root/scripts/devcontainer-onboarding.sh" ]]; then
+    if [[ "\$PWD" == "\$_vps_fleet_root" || "\$PWD" == "\$_vps_fleet_root/"* ]]; then
+      if [[ ! -f "\$_vps_fleet_marker" ]]; then
+        if bash "\$_vps_fleet_root/scripts/devcontainer-onboarding.sh"; then
+          touch "\$_vps_fleet_marker" 2>/dev/null || true
+        fi
+      fi
+    fi
+  fi
+  unset _vps_fleet_root _vps_fleet_marker _vps_fleet_auto_start
+fi
+$hook_end
+EOF
+
+  mv "$tmp" "$bashrc_path"
+}
+
 ensure_file .env
 if [[ ! -s .env && -f .env.template ]]; then
   cp .env.template .env
@@ -76,6 +117,8 @@ fi
 if ! command -v hostinger-api-mcp >/dev/null 2>&1; then
   fail "hostinger-api-mcp is missing in the devcontainer"
 fi
+
+install_bashrc_autostart_hook
 
 CODEX_STATUS="$(codex login status 2>&1 || true)"
 if echo "$CODEX_STATUS" | grep -qi "logged in"; then
