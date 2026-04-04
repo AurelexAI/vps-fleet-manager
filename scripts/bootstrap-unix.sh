@@ -39,9 +39,9 @@ if (( SKIP_INSTALL == 0 )); then
   npm install -g @openai/codex hostinger-api-mcp
 fi
 
-if [[ ! -f ".env" ]]; then
-  cp .env.template .env
-  echo "Created .env from .env.template (fill HOSTINGER_API_TOKEN)."
+if [[ ! -f "profiles.json" && -f "profiles.json.template" ]]; then
+  cp profiles.json.template profiles.json
+  echo "Created profiles.json from profiles.json.template."
 fi
 
 mkdir -p .codex
@@ -61,6 +61,6 @@ if ! command -v hostinger-api-mcp >/dev/null 2>&1; then
 fi
 
 echo "Bootstrap complete. Next steps:"
-echo "1) Update .env with HOSTINGER_API_TOKEN"
+echo "1) Update profiles.json with your Hostinger and/or Contabo credentials"
 echo "2) Run: ./scripts/doctor-unix.sh"
-echo "3) Start Codex in this repo: codex"
+echo "3) Start Codex in this repo: bash scripts/start-agent.sh"

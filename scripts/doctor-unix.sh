@@ -3,6 +3,15 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
+PROFILES_FILE="${VPS_PROFILES_PATH:-$ROOT_DIR/profiles.json}"
+case "$PROFILES_FILE" in
+  "$ROOT_DIR"/*)
+    PROFILES_LABEL="${PROFILES_FILE#$ROOT_DIR/}"
+    ;;
+  *)
+    PROFILES_LABEL="$PROFILES_FILE"
+    ;;
+esac
 
 ok() { echo "[ok] $1"; }
 warn() { echo "[warn] $1"; }
@@ -10,25 +19,67 @@ fail() { echo "[fail] $1"; exit 1; }
 
 command -v node >/dev/null 2>&1 && ok "node: $(node -v)" || fail "node missing"
 command -v npm >/dev/null 2>&1 && ok "npm: $(npm -v)" || fail "npm missing"
+command -v npx >/dev/null 2>&1 && ok "npx available" || fail "npx missing"
 command -v codex >/dev/null 2>&1 && ok "codex installed" || fail "codex missing"
 command -v hostinger-api-mcp >/dev/null 2>&1 && ok "hostinger-api-mcp installed" || fail "hostinger-api-mcp missing"
 
-if [[ -f .env ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source .env
-  set +a
-  if [[ -n "${HOSTINGER_API_TOKEN:-}" ]]; then
-    ok "HOSTINGER_API_TOKEN is set"
+if [[ -f "$PROFILES_FILE" ]]; then
+  ok "${PROFILES_LABEL} present"
+  if profiles_report="$(node scripts/profiles.js validate --file "$PROFILES_FILE" --format json 2>/dev/null)"; then
+    ok "${PROFILES_LABEL} parsed successfully"
+    tenant_count="$(printf '%s' "$profiles_report" | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(String(data.tenants));')"
+    account_count="$(printf '%s' "$profiles_report" | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(String(data.accounts.length));')"
+    warning_count="$(printf '%s' "$profiles_report" | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(String(data.warnings.length));')"
+    hostinger_count="$(node scripts/profiles.js list --file "$PROFILES_FILE" --provider hostinger --format json --optional | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(String(data.length));')"
+    contabo_count="$(node scripts/profiles.js list --file "$PROFILES_FILE" --provider contabo --format json --optional | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(String(data.length));')"
+    ok "${PROFILES_LABEL} summary: ${tenant_count} tenants, ${account_count} accounts"
+    if [[ "$warning_count" -gt 0 ]]; then
+      while IFS= read -r validation_warning; do
+        warn "$validation_warning"
+      done < <(printf '%s' "$profiles_report" | node -e 'const fs=require("fs"); const data=JSON.parse(fs.readFileSync(0,"utf8")); for (const warning of data.warnings) console.log(warning);')
+    fi
+    if [[ "$hostinger_count" -gt 0 ]]; then
+      ok "Hostinger account(s) configured in ${PROFILES_LABEL}: ${hostinger_count}"
+    else
+      warn "No hostinger accounts configured in ${PROFILES_LABEL}"
+    fi
+    if [[ "$contabo_count" -gt 0 ]]; then
+      ok "Contabo account(s) configured in ${PROFILES_LABEL}: ${contabo_count}"
+    else
+      warn "No contabo accounts configured in ${PROFILES_LABEL}"
+    fi
   else
-    warn "HOSTINGER_API_TOKEN is empty in .env"
+    fail "${PROFILES_LABEL} is invalid"
   fi
 else
-  warn ".env does not exist"
+  warn "${PROFILES_LABEL} does not exist"
+fi
+
+if [[ -f scripts/contabo-mcp.sh ]]; then
+  ok "scripts/contabo-mcp.sh present"
+else
+  warn "scripts/contabo-mcp.sh missing"
+fi
+
+if [[ -f scripts/contabo-api.js ]]; then
+  ok "scripts/contabo-api.js present"
+else
+  warn "scripts/contabo-api.js missing"
+fi
+
+if [[ -f scripts/profiles.js ]]; then
+  ok "scripts/profiles.js present"
+else
+  warn "scripts/profiles.js missing"
 fi
 
 if [[ -f .codex/config.toml ]]; then
   ok ".codex/config.toml present"
+  if grep -q '^\[mcp_servers\.contabo_api\]' .codex/config.toml; then
+    ok "Contabo MCP wrapper configured in .codex/config.toml"
+  else
+    warn "Contabo MCP wrapper missing from .codex/config.toml"
+  fi
 else
   warn ".codex/config.toml missing"
 fi

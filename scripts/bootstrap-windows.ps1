@@ -25,9 +25,9 @@ if (-not $SkipInstall) {
   npm install -g @openai/codex hostinger-api-mcp
 }
 
-if (-not (Test-Path ".env")) {
-  Copy-Item ".env.template" ".env"
-  Write-Host "Created .env from .env.template (fill HOSTINGER_API_TOKEN)."
+if (-not (Test-Path "profiles.json") -and (Test-Path "profiles.json.template")) {
+  Copy-Item "profiles.json.template" "profiles.json"
+  Write-Host "Created profiles.json from profiles.json.template."
 }
 
 if (-not (Test-Path ".codex")) {
@@ -48,6 +48,6 @@ if (-not (Get-Command hostinger-api-mcp -ErrorAction SilentlyContinue)) {
 }
 
 Write-Host "Bootstrap complete. Next steps:"
-Write-Host "1) Update .env with HOSTINGER_API_TOKEN"
+Write-Host "1) Update profiles.json with your Hostinger and/or Contabo credentials"
 Write-Host "2) Run: powershell -ExecutionPolicy Bypass -File scripts/doctor-windows.ps1"
-Write-Host "3) Start Codex in this repo: codex"
+Write-Host "3) Start Codex in this repo: powershell -ExecutionPolicy Bypass -File scripts/start-agent.ps1"

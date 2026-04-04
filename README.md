@@ -1,6 +1,10 @@
 # vps-fleet-manager
 
-Zero-setup bootstrap for a Codex agent that manages Hostinger VPS fleet using the official global MCP server: `hostinger-api-mcp`.
+Zero-setup bootstrap for a Codex agent that manages Hostinger and Contabo VPS fleets from this repository.
+
+The primary supported Hostinger path remains the official global MCP server: `hostinger-api-mcp`.
+
+Contabo is supported through the official REST API for direct read/list operations, plus an optional remote MCP connector path when a connector key is available.
 
 This repository does **not** implement a custom MCP server.
 
@@ -14,8 +18,7 @@ When you open this repo in a VS Code Dev Container:
 2. A guided onboarding script runs automatically.
 3. The script guides you through:
    - Codex login (ChatGPT or API key)
-   - Entering your `HOSTINGER_API_TOKEN`
-   - Writing `.env` for you
+   - Creating or updating `profiles.json`
    - Final health check
 4. Codex starts automatically and sends an intro that includes:
    - Agent purpose
@@ -54,9 +57,9 @@ The script runs automatically and asks for:
 1. Codex authentication:
    - `ChatGPT login` (recommended), or
    - `OPENAI_API_KEY`
-2. Your `HOSTINGER_API_TOKEN` (from Hostinger hPanel -> Profile -> API)
+2. A tenant name and `HOSTINGER_API_TOKEN` when no Hostinger profile exists yet
 
-The script writes `.env` for you and runs checks.
+The script writes `profiles.json` for you and runs checks.
 
 If the prompt window does not appear, run manually in the container terminal:
 
@@ -87,7 +90,58 @@ Now ask things like:
 
 - Creating/deleting/upgrading VPS can cost money.
 - Ask the agent to list/show details first before mutating anything.
-- Never commit `.env`.
+- Never commit `profiles.json`.
+
+## Multi-provider profiles
+
+Repository credentials now live in `profiles.json`, not `.env`.
+
+- Tracked example: `profiles.json.template`
+- Real local file: `profiles.json`
+- Inspect configured provider entries:
+
+```bash
+node scripts/profiles.js list --format text
+```
+
+- Validate the local private file:
+
+```bash
+./scripts/doctor-unix.sh
+```
+
+- Resolve the selected Hostinger credentials into the current shell session:
+
+```bash
+node scripts/profiles.js resolve --provider hostinger --format shell
+```
+
+- List Contabo instances with the selected tenant profile:
+
+```bash
+node scripts/contabo-api.js list-instances --format summary
+```
+
+The resolver uses this precedence:
+
+1. Explicit CLI selector flags on `start-agent`
+2. Process environment overrides such as `VPS_TENANT`
+3. Optional defaults in `profiles.json`
+4. Auto-select only when there is exactly one matching tenant/provider entry
+
+## Provider requirements
+
+- `hostinger`
+  - Canonical credential key in `profiles.json`: `API_TOKEN`
+  - Also accepted: `HOSTINGER_API_TOKEN`
+  - Execution path: official `hostinger-api-mcp`
+
+- `contabo`
+  - Direct official API credentials: `CLIENT_ID`, `CLIENT_SECRET`, `API_USER`, `API_PASSWORD`
+  - Optional pre-minted token: `CONTABO_ACCESS_TOKEN`
+  - Optional remote connector key: `CONTABO_MCP_API_KEY`
+  - Direct repo path: `node scripts/contabo-api.js list-instances --format summary`
+  - Optional MCP wrapper path: `scripts/contabo-mcp.sh` or `scripts/contabo-mcp.ps1`
 
 ## Files you may care about
 
@@ -95,6 +149,11 @@ Now ask things like:
 - Onboarding script: `scripts/devcontainer-onboarding.sh`
 - Agent launcher with intro prompt: `scripts/start-agent.sh`
 - MCP wrapper (Linux): `scripts/hostinger-mcp.sh`
+- Contabo API helper: `scripts/contabo-api.js`
+- Contabo MCP wrapper (Linux): `scripts/contabo-mcp.sh`
+- Contabo MCP wrapper (Windows): `scripts/contabo-mcp.ps1`
+- Shared profile resolver: `scripts/profiles.js`
+- Profiles template: `profiles.json.template`
 - Linux Codex MCP template: `.codex/config.toml.example`
 - Agent rules: `AGENTS.md`
 
@@ -104,16 +163,18 @@ Linux/macOS:
 
 ```bash
 ./scripts/bootstrap-unix.sh
+node scripts/profiles.js list --format text
 ./scripts/doctor-unix.sh
-bash scripts/start-agent.sh
+bash scripts/start-agent.sh --tenant customer-a
 ```
 
 Windows PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/bootstrap-windows.ps1
+powershell -ExecutionPolicy Bypass -Command "node scripts/profiles.js list --format text"
 powershell -ExecutionPolicy Bypass -File scripts/doctor-windows.ps1
-powershell -ExecutionPolicy Bypass -File scripts/start-agent.ps1
+powershell -ExecutionPolicy Bypass -File scripts/start-agent.ps1 -Tenant customer-a
 ```
 
 ## Disable auto-start (optional)
@@ -124,7 +185,7 @@ Set `AUTO_START_CODEX` to `false` in `.devcontainer/devcontainer.json` if you do
 
 This repository is a cloned and modified version of Ratio1 Open Source.
 
-- Original repository: https://github.com/Ratio1/vps-agent
+- Original repository: https://github.com/ratio1/vps-agent
 - Upstream base: Ratio1 Open Source under Apache License 2.0 (commercial use allowed).
 - This modified repository includes AurelexAI-specific changes.
 - The repository remains open, but commercial use of AurelexAI-specific modifications requires prior written permission from AurelexAI.

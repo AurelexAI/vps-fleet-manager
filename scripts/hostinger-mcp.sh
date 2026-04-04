@@ -3,11 +3,12 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [[ -f "$ROOT_DIR/.env" ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source "$ROOT_DIR/.env"
-  set +a
+if [[ -z "${API_TOKEN:-}" && -z "${HOSTINGER_API_TOKEN:-}" ]]; then
+  if [[ -f "${VPS_PROFILES_PATH:-$ROOT_DIR/profiles.json}" ]]; then
+    eval "$(
+      node "$ROOT_DIR/scripts/profiles.js" resolve --provider hostinger --format shell
+    )"
+  fi
 fi
 
 if ! command -v hostinger-api-mcp >/dev/null 2>&1; then
@@ -16,7 +17,7 @@ if ! command -v hostinger-api-mcp >/dev/null 2>&1; then
 fi
 
 if [[ -z "${HOSTINGER_API_TOKEN:-}" && -z "${API_TOKEN:-}" ]]; then
-  echo "Missing HOSTINGER_API_TOKEN in .env (or API_TOKEN in environment)." >&2
+  echo "Missing HOSTINGER_API_TOKEN or API_TOKEN in the environment or selected profiles.json entry." >&2
   exit 1
 fi
 

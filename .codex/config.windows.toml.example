@@ -4,3 +4,8 @@
 [mcp_servers.hostinger_api]
 command = "powershell"
 args = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/hostinger-mcp.ps1"]
+
+[mcp_servers.contabo_api]
+enabled = false
+command = "powershell"
+args = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/contabo-mcp.ps1"]
