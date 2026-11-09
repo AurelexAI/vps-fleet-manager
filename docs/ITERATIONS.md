@@ -32,3 +32,7 @@
 - Cleaned up remaining documentation drift.
 - Deleted the obsolete local `.env`.
 - Performed a final hostname check for both providers.
+
+## FND-112 cleanup
+
+- Deleted the obsolete `.env.template` compatibility marker. `profiles.json.template` is the only tracked credentials template; `.env` stays gitignored.
