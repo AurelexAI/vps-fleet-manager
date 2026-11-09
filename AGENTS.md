@@ -26,13 +26,13 @@ Record meaningful iterations in `docs/ITERATIONS.md`.
 ## Required Operational Behavior
 
 - Validate environment first (`doctor` scripts) before agent execution.
-- Ensure Hostinger token is loaded from `.env` and never logged.
+- Ensure the Hostinger token is resolved from the private `profiles.json` and never logged.
 - Prefer read/list operations before any mutating/billable action.
 - Ask for explicit user confirmation intent before destructive actions.
 
 ## Security Rules
 
-- Never commit `.env`.
+- Never commit `profiles.json` or any `.env` file (both are gitignored).
 - Never commit `.codex/config.toml` with local secrets.
 - Never print or echo token values.
 - Keep wrapper scripts minimal and auditable.
@@ -49,6 +49,6 @@ A change is complete when:
 
 1. Scripts referenced in docs actually exist and execute.
 2. Linux/macOS and Windows bootstrap paths are documented.
-3. `.env.template` and `.codex` templates are up to date.
+3. `profiles.json.template` and `.codex` templates are up to date.
 4. `docs/RESEARCH.md`, `docs/IMPLEMENTATION_PLAN.md`, and `docs/ITERATIONS.md` reflect the current architecture.
 5. No custom local MCP server code is introduced.
